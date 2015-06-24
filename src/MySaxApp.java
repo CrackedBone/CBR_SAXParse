@@ -23,7 +23,7 @@ class CurrencyRate {
 
 public class MySaxApp extends DefaultHandler {
     final private static String URL = "http://www.cbr.ru/scripts/XML_daily.asp";
-    String curElement = "";
+    String curElementName = "";
     static CurrencyRate current;
     static String code;
 
@@ -65,7 +65,7 @@ public class MySaxApp extends DefaultHandler {
 
     public void startElement(String uri, String name,
                              String qName, Attributes atts) throws SAXException {
-        curElement = qName;
+        curElementName = qName;
         if (qName.equals("Valute")) {
             current = new CurrencyRate();
         }
@@ -79,25 +79,29 @@ public class MySaxApp extends DefaultHandler {
                 //TODO: throw exception to stop parsing if needed currency found
             }
         }
-        curElement = "";
+        curElementName = "";
     }
 
     public void characters(char[] ch, int start, int length) throws SAXException {
-        if (curElement.equals("NumCode")) {
-            current.numCode = new String(ch, start, length);
-        }
-        if (curElement.equals("CharCode")) {
-            current.charCode = new String(ch, start, length);
-        }
-        if (curElement.equals("Nominal")) {
-            current.nominal = new Integer(new String(ch, start, length));
-        }
-        if (curElement.equals("Name")) {
-            current.name = new String(ch, start, length);
-        }
-        if (curElement.equals("Value")) {
-            String value = new String(ch, start, length);
-            current.value = new BigDecimal(value.replace(",", "."));
+        switch (curElementName){
+            case "NumCode" :
+                current.numCode = new String(ch, start, length);
+                break;
+            case "CharCode" :
+                current.charCode = new String(ch, start, length);
+                break;
+            case "Nominal" :
+                current.nominal = new Integer(new String(ch, start, length));
+                break;
+            case "Name":
+                current.name = new String(ch, start, length);
+                break;
+            case "Value" :
+                String value = new String(ch, start, length);
+                current.value = new BigDecimal(value.replace(",", "."));
+                break;
+            default:
+                break;
         }
     }
 
